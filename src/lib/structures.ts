@@ -85,7 +85,7 @@ export class Command {
 
 	data: CommandData;
 	run: (obj: {
-		interaction: ChatInputCommandInteraction,
+		interaction: ChatInputCommandInteraction<'cached'>,
 		response: ResponseManager
 	}) => Promise<any>;
 
