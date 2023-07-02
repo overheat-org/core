@@ -1,7 +1,7 @@
-import { ClientEvents } from "discord.js";
+import type { ClientEvents } from "discord.js";
 
-export function OnEvent(eventType: keyof ClientEvents): (target: any, ctx: ClassMethodDecoratorContext) => void
-export function OnEvent(eventType: string): (target: any, ctx: ClassMethodDecoratorContext) => void
+export function OnEvent(eventType: keyof ClientEvents): (target: any, ctx: ClassMethodDecoratorContext) => any
+export function OnEvent(eventType: string): (target: any, ctx: ClassMethodDecoratorContext) => any
 export function OnEvent(eventType: unknown) {
 	return (target, ctx: ClassMethodDecoratorContext) => {
 		if (ctx.kind != 'method') {

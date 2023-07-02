@@ -3,6 +3,7 @@ import DotEnv from 'dotenv';
 
 import Loader from './loader';
 import { Command, ResponseManager } from './structures';
+import Config from './config';
 
 class Bot<Ready extends boolean = boolean> extends DJS.Client<Ready> {
 	constructor(options: DJS.ClientOptions) {
@@ -35,19 +36,26 @@ class Bot<Ready extends boolean = boolean> extends DJS.Client<Ready> {
 		}
 	}
 
-	private runLoader() {
+	private runLoader(target: string) {
 		const loader = new Loader(this);
 
-		loader.loadCommands(process.cwd() + '/src/commands');
-		loader.loadEvents(process.cwd() + '/src/events');
-		loader.loadComponents(process.cwd() + '/src/components');
+		this.waitReady().then(() => loader.loadCommands(target + '/commands'))
+		loader.loadEvents(target + '/events');
+		loader.loadComponents(target + '/components');
 	}
 
 	public async start() {
-		this.runLoader();
+		const config = await Config.use('./.solidrc')
+		this.runLoader(config.target);
 		await this.login();
 
 		return this;
+	}
+
+	public waitReady() {
+		return new Promise(resolve => {
+			this.once('ready', resolve);
+		})
 	}
 }
 

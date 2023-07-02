@@ -15,6 +15,7 @@ class Loader {
 
 		for (let i = 0; i < allFileNames.length; i++) {
 			const filePath = path.join(dirpath, allFileNames[i]);
+			let breakLoop = false;
 
 			import(filePath).then(f => {
 				if (Object.keys(f.default).length == 0) {
@@ -23,10 +24,22 @@ class Loader {
 
 				const command = f.default;
 				Command.cache.set(command.name, command);
-				(this.client.guilds.fetch(process.env.guildTest as string)).then(g => {
+
+				const guildTestId = process.env.GUILD_TEST;
+
+				if (!guildTestId) {
+					console.log('warn: enviroment variable "GUILD_TEST" not specified')
+					return breakLoop = true;
+				}
+
+				(this.client.guilds.fetch(process.env.GUILD_TEST as string)).then(g => {
 					g.commands.create(command.data);
 				})
 			})
+
+			if (breakLoop) {
+				break;
+			}
 		}
 	}
 
