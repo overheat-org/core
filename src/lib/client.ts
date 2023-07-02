@@ -14,14 +14,17 @@ class Bot<Ready extends boolean = boolean> extends DJS.Client<Ready> {
 	}
 
 	private listenCommands() {
-		this.on('interactionCreate', interaction => {
+		this.on('interactionCreate', (interaction: DJS.Interaction<any>) => {
 			if (!interaction.isChatInputCommand()) return;
 
 			const foundCommand = Command.cache.get(interaction.commandName);
 			const response = new ResponseManager(interaction);
 
 			try {
-				foundCommand!.run({ interaction, response });
+				foundCommand!.run({
+					interaction,
+					response
+				});
 			} catch (err) {
 				console.error(`Comando deu errado: ${err}`);
 			}

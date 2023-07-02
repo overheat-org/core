@@ -1,7 +1,7 @@
 import { readdirSync } from "fs";
 import Bot from "./client";
 import path from "path";
-import { Command } from "./structures";
+import { Command, Event } from "./structures";
 
 const privateComponentRegex = /^\(.*\)\.ts$/;
 
@@ -15,31 +15,26 @@ class Loader {
 
 		for (let i = 0; i < allFileNames.length; i++) {
 			const filePath = path.join(dirpath, allFileNames[i]);
-			let breakLoop = false;
+
+			const guildTestId = process.env.GUILD_TEST;
+			if (!guildTestId) {
+				console.log('warn: enviroment variable "GUILD_TEST" not specified')
+			}
 
 			import(filePath).then(f => {
 				if (Object.keys(f.default).length == 0) {
 					throw new Error(`File "${filePath}" hasn't default export`);
 				}
 
-				const command = f.default;
-				Command.cache.set(command.name, command);
+				const command: Command = f.default;
+				Command.cache.set(command.data.name, command);
 
-				const guildTestId = process.env.GUILD_TEST;
-
-				if (!guildTestId) {
-					console.log('warn: enviroment variable "GUILD_TEST" not specified')
-					return breakLoop = true;
-				}
+				if (!guildTestId) return;
 
 				(this.client.guilds.fetch(process.env.GUILD_TEST as string)).then(g => {
 					g.commands.create(command.data);
 				})
 			})
-
-			if (breakLoop) {
-				break;
-			}
 		}
 	}
 
@@ -54,8 +49,8 @@ class Loader {
 					throw new Error(`File "${filePath}" hasn't default export`);
 				}
 
-				const event = f.default;
-				this.client[event.once ? "once" : "on"](event.type, (...args: any) =>
+				const event: Event<any> = f.default;
+				this.client[event.data.once ? "once" : "on"](event.data.type, (...args: any) =>
 					event.run({ client: this.client }, ...args)
 				);
 			})
