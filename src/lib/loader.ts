@@ -22,7 +22,7 @@ class Loader {
 			}
 
 			import(filePath).then(f => {
-				if (Object.keys(f.default).length == 0) {
+				if (!f.default) {
 					throw new Error(`File "${filePath}" hasn't default export`);
 				}
 
@@ -45,7 +45,7 @@ class Loader {
 			const filePath = path.join(dirpath, allFileNames[i]);
 
 			import(filePath).then(f => {
-				if (Object.keys(f.default).length == 0) {
+				if (!f.default) {
 					throw new Error(`File "${filePath}" hasn't default export`);
 				}
 
@@ -64,7 +64,7 @@ class Loader {
 			const filePath = path.join(dirpath, allFileNames[i]);
 
 			import(filePath).then(f => {
-				if (Object.keys(f.default).length == 0) {
+				if (!f.default) {
 					throw new Error(`File "${filePath}" hasn't default export`);
 				}
 

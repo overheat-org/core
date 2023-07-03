@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionData, ChatInputCommandInteraction, ClientEvents, LocalizationMap, Permissions } from "discord.js";
-import client from "./client";
+import _client from "./client";
 
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ColorResolvable, CommandInteraction, EmbedBuilder, EmbedData } from "discord.js";
 
@@ -104,7 +104,7 @@ export declare class EventData<Type extends keyof ClientEvents> {
 export class Event<Type extends keyof ClientEvents> {
 	data: EventData<Type>;
 	run: (
-		options: { client: client },
+		options: { client: _client },
 		...args: ClientEvents[Type]
 	) => Promise<any>;
 
@@ -112,5 +112,13 @@ export class Event<Type extends keyof ClientEvents> {
 		const { run, ...data } = event;
 		this.run = run;
 		this.data = data;
+	}
+}
+
+export abstract class Component {
+	static instance: Component;
+
+	constructor(protected client: typeof _client) {
+		Component.instance = this;
 	}
 }
