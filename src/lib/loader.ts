@@ -56,23 +56,6 @@ class Loader {
 			})
 		}
 	}
-
-	loadComponents(dirpath: string) {
-		const allFileNames = readdirSync(dirpath).filter(f => !privateComponentRegex.test(f));
-
-		for (let i = 0; i < allFileNames.length; i++) {
-			const filePath = path.join(dirpath, allFileNames[i]);
-
-			import(filePath).then(f => {
-				if (!f.default) {
-					throw new Error(`File "${filePath}" hasn't default export`);
-				}
-
-				const component = f.default;
-				new component(this.client);
-			})
-		}
-	}
 }
 
 export default Loader;
