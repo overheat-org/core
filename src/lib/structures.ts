@@ -108,7 +108,7 @@ export class Event<Type extends keyof ClientEvents> {
 		...args: ClientEvents[Type]
 	) => Promise<any>;
 
-	constructor(event: Event<any>['data'] & { run: Event<any>['run'] }) {
+	constructor(event: Event<Type>['data'] & { run: Event<Type>['run'] }) {
 		const { run, ...data } = event;
 		this.run = run;
 		this.data = data;
