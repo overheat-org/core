@@ -1,6 +1,6 @@
 node_modules/
-/index.js
 yarn.lock
 /lib/
 /utils/
 *.d.ts
+*.js
