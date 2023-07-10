@@ -1,21 +1,19 @@
-import { ApplicationCommandOptionData, ChatInputCommandInteraction, ClientEvents, LocalizationMap, Permissions } from "discord.js";
+import DJS from "discord.js";
 import _client from "./client";
 
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ColorResolvable, CommandInteraction, EmbedBuilder, EmbedData } from "discord.js";
-
 export class ResponseManager {
-	interaction: CommandInteraction;
+	interaction: DJS.CommandInteraction;
 	private ephemeral: boolean = false;
 
 	setEphemeral(boolean: boolean) {
 		this.ephemeral = boolean
 	}
 
-	constructor(interaction: CommandInteraction) {
+	constructor(interaction: DJS.CommandInteraction) {
 		this.interaction = interaction;
 	}
 
-	success(data: string | EmbedData, linkButton?: { url: string, label: string }) {
+	success(data: string | DJS.EmbedData, linkButton?: { url: string, label: string }) {
 		this.interaction.reply({
 			embeds: [this.generateEmbed({
 				data,
@@ -23,9 +21,9 @@ export class ResponseManager {
 				color: '#1cff95'
 			})],
 			components: linkButton ? [
-				<any>new ActionRowBuilder().addComponents(
-					new ButtonBuilder()
-						.setStyle(ButtonStyle.Link)
+				<any>new DJS.ActionRowBuilder().addComponents(
+					new DJS.ButtonBuilder()
+						.setStyle(DJS.ButtonStyle.Link)
 						.setLabel(linkButton.label)
 						.setURL(linkButton.url)
 				)
@@ -34,7 +32,7 @@ export class ResponseManager {
 		})
 	}
 
-	error(data: string | EmbedData) {
+	error(data: string | DJS.EmbedData) {
 		this.interaction.reply({
 			embeds: [this.generateEmbed({
 				data,
@@ -45,10 +43,10 @@ export class ResponseManager {
 		})
 	}
 
-	generateEmbed(obj: { data: string | EmbedData, color: ColorResolvable, defaultTitle: string }) {
+	generateEmbed(obj: { data: string | DJS.EmbedData, color: DJS.ColorResolvable, defaultTitle: string }) {
 		const embed = typeof obj.data == 'string'
 			? obj.data.length > 20
-				? new EmbedBuilder()
+				? new DJS.EmbedBuilder()
 					.setTitle(obj.defaultTitle)
 					.setDescription(obj.data)
 					.setColor(obj.color)
@@ -56,13 +54,13 @@ export class ResponseManager {
 						text: this.interaction.user.username,
 						iconURL: this.interaction.user.avatarURL() ?? this.interaction.user.defaultAvatarURL
 					})
-				: new EmbedBuilder()
+				: new DJS.EmbedBuilder()
 					.setAuthor({
 						name: obj.data,
 						iconURL: this.interaction.user.avatarURL() ?? this.interaction.user.defaultAvatarURL
 					})
 					.setColor(obj.color)
-			: new EmbedBuilder(obj.data)
+			: new DJS.EmbedBuilder(obj.data)
 				.setColor(obj.data.color ? obj.data.color : obj.color)
 
 		return embed;
@@ -71,10 +69,10 @@ export class ResponseManager {
 
 export declare class CommandData {
 	name: string;
-	name_localizations?: LocalizationMap;
+	name_localizations?: DJS.LocalizationMap;
 	description: string;
-	description_localizations?: LocalizationMap;
-	options: ApplicationCommandOptionData[];
+	description_localizations?: DJS.LocalizationMap;
+	options: DJS.ApplicationCommandOptionData[];
 	default_permission?: boolean;
 	default_member_permissions?: Permissions | null;
 	dm_permission?: boolean;
@@ -85,9 +83,9 @@ export class Command {
 
 	data: CommandData;
 	run: (obj: {
-		interaction: ChatInputCommandInteraction<'cached'>,
+		interaction: DJS.ChatInputCommandInteraction<'cached'>,
 		response: ResponseManager
-	}) => Promise<any>;
+	}) => any;
 
 	constructor(command: Command['data'] & { run: Command['run'] }) {
 		const { run, ...data } = command;
@@ -96,29 +94,18 @@ export class Command {
 	}
 }
 
-export declare class EventData<Type extends keyof ClientEvents> {
+export declare class EventData<Type extends keyof DJS.ClientEvents> {
 	type: Type;
 	once?: boolean;
 }
 
-export class Event<Type extends keyof ClientEvents> {
+export class Event<Type extends keyof DJS.ClientEvents> {
 	data: EventData<Type>;
-	run: (
-		options: { client: _client },
-		...args: ClientEvents[Type]
-	) => Promise<any>;
+	run: (...args: DJS.ClientEvents[Type]) => any;
 
 	constructor(event: Event<Type>['data'] & { run: Event<Type>['run'] }) {
 		const { run, ...data } = event;
 		this.run = run;
 		this.data = data;
-	}
-}
-
-export abstract class Component {
-	static instance: Component;
-
-	constructor(protected client: typeof _client) {
-		Component.instance = this;
 	}
 }

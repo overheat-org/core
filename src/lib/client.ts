@@ -44,11 +44,10 @@ class Bot<Ready extends boolean = boolean> extends DJS.Client<Ready> {
 
 		this.waitReady().then(() => loader.loadCommands(target + '/commands'))
 		loader.loadEvents(target + '/events');
-		loader.loadComponents(target + '/components');
 	}
 
 	public async start() {
-		const config = await Config.use('./.solidrc')
+		const config = await Config.use('./.solidrc');
 		this.runLoader(config.target);
 		await this.login();
 

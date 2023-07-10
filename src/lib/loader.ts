@@ -32,7 +32,14 @@ class Loader {
 				if (!guildTestId) return;
 
 				(this.client.guilds.fetch(process.env.GUILD_TEST as string)).then(g => {
-					g.commands.create(command.data);
+					const fetchedCommand = g.commands.cache.find(c => c.name == g.name);
+
+
+					if (fetchedCommand) {
+						g.commands.edit(fetchedCommand.id, command.data)
+					} else {
+						g.commands.create(command.data);
+					}
 				})
 			})
 		}
