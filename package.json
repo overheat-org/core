@@ -1,7 +1,7 @@
 {
   "name": "@nexusprime-here/solidcore",
   "description": "A discord.js core",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "main": "index.js",
   "scripts": {
     "build": "tsc"
@@ -26,6 +26,6 @@
     "lib": "lib"
   },
   "bin": {
-    "solid": "./cli.js"
+    "core": "./cli.js"
   }
 }

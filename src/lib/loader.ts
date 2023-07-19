@@ -3,8 +3,6 @@ import Bot from "./client";
 import path from "path";
 import { Command, Event } from "./structures";
 
-const privateComponentRegex = /^\(.*\)\.ts$/;
-
 class Loader {
 	constructor(
 		private client: Bot

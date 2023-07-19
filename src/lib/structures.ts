@@ -1,4 +1,4 @@
-import DJS from "discord.js";
+import DJS, { Interaction } from "discord.js";
 import _client from "./client";
 
 export class ResponseManager {
@@ -86,11 +86,13 @@ export class Command {
 		interaction: DJS.ChatInputCommandInteraction<'cached'>,
 		response: ResponseManager
 	}) => any;
+	autocomplete?: (interaction: DJS.ChatInputCommandInteraction<'cached'>) => any;
 
-	constructor(command: Command['data'] & { run: Command['run'] }) {
-		const { run, ...data } = command;
+	constructor(command: Command['data'] & { run: Command['run'] } & { autocomplete: Command['autocomplete'] }) {
+		const { run, autocomplete, ...data } = command;
 		this.run = run;
 		this.data = data;
+		this.autocomplete = autocomplete;
 	}
 }
 
