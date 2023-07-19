@@ -15,18 +15,27 @@ class Bot<Ready extends boolean = boolean> extends DJS.Client<Ready> {
 
 	private listenCommands() {
 		this.on('interactionCreate', (interaction: DJS.Interaction<any>) => {
-			if (!interaction.isChatInputCommand()) return;
+			if (interaction.isChatInputCommand()) {
+				const foundCommand = Command.cache.get(interaction.commandName);
+				const response = new ResponseManager(interaction);
 
-			const foundCommand = Command.cache.get(interaction.commandName);
-			const response = new ResponseManager(interaction);
+				try {
+					foundCommand!.run({
+						interaction,
+						response
+					});
+				} catch (err) {
+					console.error(`Comando deu errado: ${err}`);
+				}
+			}
+			else if (interaction.isAutocomplete()) {
+				const foundCommand = Command.cache.get(interaction.commandName);
 
-			try {
-				foundCommand!.run({
-					interaction,
-					response
-				});
-			} catch (err) {
-				console.error(`Comando deu errado: ${err}`);
+				try {
+					foundCommand?.autocomplete?.(interaction);
+				} catch (err) {
+					console.error(`autocomplete erro: ${err}`)
+				}
 			}
 		})
 	}
