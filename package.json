@@ -1,10 +1,11 @@
 {
   "name": "@nexusprime-here/solidcore",
   "description": "A discord.js core",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "main": "index.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "push": "tsc; yarn publish"
   },
   "publishConfig": {
     "@<em>nexusprime-here": "https://npm.pkg.github.com"
