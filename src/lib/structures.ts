@@ -88,7 +88,7 @@ export class Command {
 	}) => any;
 	autocomplete?: (interaction: DJS.AutocompleteInteraction<'cached'>) => any;
 
-	constructor(command: Command['data'] & { run: Command['run'] } & { autocomplete: Command['autocomplete'] }) {
+	constructor(command: Command['data'] & { run: Command['run'] } & { autocomplete?: Command['autocomplete'] }) {
 		const { run, autocomplete, ...data } = command;
 		this.run = run;
 		this.data = data;
