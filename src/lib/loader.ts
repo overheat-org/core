@@ -55,9 +55,7 @@ class Loader {
 				}
 
 				const event: Event<any> = f.default;
-				this.client[event.data.once ? "once" : "on"](event.data.type, (...args: any) =>
-					event.run({ client: this.client }, ...args)
-				);
+				this.client[event.data.once ? "once" : "on"](event.data.type, (...args: any) => event.run(...args));
 			})
 		}
 	}
