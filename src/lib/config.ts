@@ -1,5 +1,5 @@
 import { readFileSync } from "fs";
-import {join as j} from "path";
+import { join as j } from "path";
 
 export default class Config {
 	private _target = process.cwd() + "/src";
