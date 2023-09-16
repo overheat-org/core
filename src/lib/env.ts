@@ -1,9 +1,12 @@
+import { join as j } from 'path';
 import DotEnv from "dotenv";
 import { existsSync } from "fs";
+import Logger from './logger';
+
+const devPath = j(process.cwd(), '/.env.development');
+const prodPath = j(process.cwd(), '/.env.production');
 
 function loadEnv() {
-	const devPath = process.cwd() + '/.env.development';
-	const prodPath = process.cwd() + '/.env.production';
 	let path: string;
 
 	if (process.env.NODE_ENV == 'development' && existsSync(devPath)) {
@@ -18,7 +21,7 @@ function loadEnv() {
 		if(existsSync(commonPath)) {
 			path = commonPath;
 		} else {
-			console.warn('Env file not found')
+			Logger.warn('Env file not found')
 
 			return;
 		}

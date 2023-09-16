@@ -4,6 +4,7 @@ import ProductionClient from "./client/production";
 import { join as j, basename } from "path";
 import { Command, Event } from "./structures";
 import { readdir } from "fs/promises";
+import Logger from "./logger";
 
 type File = { path: string, parent: string };
 
@@ -51,51 +52,59 @@ class Loader {
 	}
 	
 	loadCommand(file: File) {
-		import(file.path).then(async (f) => {
-			if (!f.default) {
-				throw new Error(`File "${file.path}" hasn't default export`);
-			}
-
-			const command: Command = f.default;
-			Command.cache.set(command.data.name, command);
-
-			let targetRegister: DJS.GuildApplicationCommandManager | DJS.ApplicationCommandManager<DJS.ApplicationCommand<{ guild: DJS.GuildResolvable; }>, { guild: DJS.GuildResolvable; }, null>;
-			if (process.env.NODE_ENV == 'development') {
-				const guildTestId = process.env.GUILD_TEST;
-
-				if (!guildTestId) {
-					throw new Error('Enviroment variable "GUILD_TEST" not specified');
+		try {
+			import(file.path).then(async (f) => {
+				if (!f.default) {
+					throw new Error(`File "${file.path}" hasn't default export`);
 				}
-
-				targetRegister = (await this.client.guilds.fetch(guildTestId)).commands;
-			} else {
-				targetRegister = this.client.application!.commands;
-			}
-
-			const fetchedCommand = targetRegister.cache.find(
-				(c) => c.name == command.data.name
-			);
-
-			if (fetchedCommand) {
-				targetRegister.edit(fetchedCommand.id, command.data);
-			} else {
-				targetRegister.create(command.data);
-			}
-		});
+	
+				const command: Command = f.default;
+				Command.cache.set(command.data.name, command);
+	
+				let targetRegister: DJS.GuildApplicationCommandManager | DJS.ApplicationCommandManager<DJS.ApplicationCommand<{ guild: DJS.GuildResolvable; }>, { guild: DJS.GuildResolvable; }, null>;
+				if (process.env.NODE_ENV == 'development') {
+					const guildTestId = process.env.GUILD_TEST;
+	
+					if (!guildTestId) {
+						throw new Error('Enviroment variable "GUILD_TEST" not specified');
+					}
+	
+					targetRegister = (await this.client.guilds.fetch(guildTestId)).commands;
+				} else {
+					targetRegister = this.client.application!.commands;
+				}
+	
+				const fetchedCommand = targetRegister.cache.find(
+					(c) => c.name == command.data.name
+				);
+	
+				if (fetchedCommand) {
+					targetRegister.edit(fetchedCommand.id, command.data);
+				} else {
+					targetRegister.create(command.data);
+				}
+			});
+		} catch(e: any) {
+			Logger.error(e);
+		}
 	}
 
 	loadEvent(file: File) {
-		import(file.path).then((f) => {
-			if (!f.default) {
-				throw new Error(`File "${file.path}" hasn't default export`);
-			}
-
-			const event: Event<any> = f.default;
-			this.client[event.data.once ? "once" : "on"](
-				event.data.type,
-				(...args: any) => event.run(...args)
-			);
-		});
+		try {
+			import(file.path).then((f) => {
+				if (!f.default) {
+					throw new Error(`File "${file.path}" hasn't default export`);
+				}
+	
+				const event: Event<any> = f.default;
+				this.client[event.data.once ? "once" : "on"](
+					event.data.type,
+					(...args: any) => event.run(...args)
+				);
+			});
+		} catch(e: any) {
+			Logger.error(e);
+		}
 	}
 }
 
