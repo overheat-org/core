@@ -1,5 +1,5 @@
 {
-  "name": "@overheat/core",
+  "name": "@overheat-org/core",
   "description": "A discord core",
   "version": "1.3.0",
   "main": "index.js",
