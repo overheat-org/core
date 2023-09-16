@@ -14,7 +14,8 @@
   "license": "ISC",
   "dependencies": {
     "discord.js": "^14.11.0",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "ts-node": "^10.9.1"
   },
   "repository": {
     "url": "git://github.com/nexusprime-here/solidcore.git"
@@ -27,6 +28,6 @@
     "lib": "lib"
   },
   "bin": {
-    "core": "./cli.js"
+    "solid": "./cli.py"
   }
 }
