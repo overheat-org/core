@@ -1,5 +1,5 @@
-import DJS, { Interaction } from "discord.js";
-import _client from "./client";
+import DJS from "discord.js";
+import _client from "./client/production";
 
 export class ResponseManager {
 	interaction: DJS.CommandInteraction;
@@ -21,7 +21,7 @@ export class ResponseManager {
 				color: '#1cff95'
 			})],
 			components: linkButton ? [
-				<any>new DJS.ActionRowBuilder().addComponents(
+				new DJS.ActionRowBuilder<DJS.ButtonBuilder>().addComponents(
 					new DJS.ButtonBuilder()
 						.setStyle(DJS.ButtonStyle.Link)
 						.setLabel(linkButton.label)
