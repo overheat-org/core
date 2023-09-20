@@ -1,8 +1,9 @@
 import Config from '../config';
 import Loader from '../loader';
 import _Client from './production';
+import ProductionClient from './production';
 
-class DevelopmentClient<Ready extends boolean = boolean> extends _Client<Ready> {
+class DevelopmentClient<Ready extends boolean = boolean> extends ProductionClient<Ready> {
 	private runLoaders(target: string) {
 		const loader = new Loader(this);
 
@@ -16,12 +17,6 @@ class DevelopmentClient<Ready extends boolean = boolean> extends _Client<Ready> 
 		await this.login();
 
 		return this;
-	}
-
-	public waitReady() {
-		return new Promise(resolve => {
-			this.once('ready', resolve);
-		})
 	}
 }
 
