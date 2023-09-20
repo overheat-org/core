@@ -1,4 +1,3 @@
-import fs from "fs";
 import DJS from 'discord.js';
 import ProductionClient from "./client/production";
 import { join as j, basename } from "path";
@@ -9,7 +8,7 @@ import Logger from "./logger";
 type File = { path: string, parent: string };
 
 class Loader {
-	constructor(private client: ProductionClient, cached = false) {}
+	constructor(private client: ProductionClient) {}
 
 	async readDir(path: string, options = { forFile: false }) {
 		const joinOnDir = async (path: string, parent: string) => {
