@@ -1,7 +1,7 @@
 {
   "name": "@overheat-org/core",
   "description": "A discord core",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
