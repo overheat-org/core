@@ -2,8 +2,9 @@ import DJS from 'discord.js';
 import ProductionClient from "./client/production";
 import { join as j, basename } from "path";
 import { Command, Event } from "./structures";
-import { readdir } from "fs/promises";
+import { readdir,  } from "fs/promises";
 import Logger from "./logger";
+import { existsSync } from 'fs';
 
 type File = { path: string, parent: string };
 
@@ -11,6 +12,8 @@ class Loader {
 	constructor(private client: ProductionClient) {}
 
 	async readDir(path: string, options = { forFile: false }) {
+		if(!existsSync(path)) return;
+
 		const joinOnDir = async (path: string, parent: string) => {
 			const files = new Array<File>();
 			const readDir = await readdir(path, { withFileTypes: true });
