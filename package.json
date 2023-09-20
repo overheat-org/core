@@ -5,15 +5,16 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "push": "tsc; npm publish"
+    "push": "tsc; npm publish",
+    "test": "cd test && npm test"
   },
   "publishConfig": {
-	"@overheat-org:registry": "https://npm.pkg.github.com"
+    "@overheat-org:registry": "https://npm.pkg.github.com"
   },
   "types": "./types",
   "license": "ISC",
   "dependencies": {
-    "chalk": "^5.3.0",
+    "chalk": "4",
     "discord.js": "^14.11.0",
     "dotenv": "^16.3.1",
     "ts-node": "^10.9.1"

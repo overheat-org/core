@@ -1,0 +1,10 @@
+{
+	"name": "test",
+	"private": true,
+	"scripts": {
+		"test": "node ./ dev"
+	},
+	"dependencies": {
+		"@overheat-org/core": "../"
+	}
+}
