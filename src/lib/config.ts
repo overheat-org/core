@@ -1,5 +1,8 @@
+import DJS from 'discord.js';
 import { readFileSync } from "fs";
 import { join as j } from "path";
+
+const Intent = DJS.GatewayIntentBits;
 
 export default class Config {
 	private _target = process.cwd() + "/src";
@@ -10,7 +13,11 @@ export default class Config {
 		return this._target;
 	}
 
-	static async use(dirpath = process.cwd()) {
+	clientOptions: DJS.ClientOptions = {
+		intents: [Intent.Guilds]
+	}
+
+	static use(dirpath = process.cwd()) {
 		const fileData = readFileSync(j(dirpath, '.overheatrc')).toString();
 		const fileInJsonFormat = JSON.parse(fileData);
 
