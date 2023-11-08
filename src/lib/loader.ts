@@ -1,5 +1,5 @@
 import DJS from 'discord.js';
-import ProductionClient from "./client/production";
+import Client from "./client";
 import { join as j, basename } from "path";
 import { Command, Event } from "./structures";
 import { readdir,  } from "fs/promises";
@@ -9,7 +9,7 @@ import { existsSync } from 'fs';
 type File = { path: string, parent: string };
 
 class Loader {
-	constructor(private client: ProductionClient) {}
+	constructor(private client: Client) {}
 
 	async readDir(path: string, options = { forFile: false }) {
 		if(!existsSync(path)) return;
