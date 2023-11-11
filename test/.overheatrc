@@ -1,3 +1,6 @@
 {
-	"target": "./"
+	"target": "./",
+	"clientOptions": {
+		"intents": ["Guilds", "GuildMessages"]
+	}
 }

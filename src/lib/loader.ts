@@ -3,7 +3,6 @@ import Client from "./client";
 import { join as j, basename } from "path";
 import { Command, Event } from "./structures";
 import { readdir,  } from "fs/promises";
-import Logger from "./logger";
 import { existsSync } from 'fs';
 
 type File = { path: string, parent: string };
@@ -11,7 +10,7 @@ type File = { path: string, parent: string };
 class Loader {
 	constructor(private client: Client) {}
 
-	async readDir(path: string, options = { forFile: false }) {
+	async run(path: string) {
 		if(!existsSync(path)) return;
 
 		const joinOnDir = async (path: string, parent: string) => {
@@ -27,8 +26,12 @@ class Loader {
 				}
 				else if(dirent.isDirectory()) {
 					if(dirent.name.startsWith('#')) return;
-
-					await joinOnDir(path, parent);
+					
+					if(['commands', 'events'].includes(dirent.name)) {						
+						await joinOnDir(path, dirent.name);
+					} else {
+						await joinOnDir(path, parent);
+					}
 				}
 			}
 
@@ -36,76 +39,71 @@ class Loader {
 		}
 
 		const dir = await joinOnDir(path, basename(path));
+
+		dir
+			?.filter(f => f.parent == 'commands' || /\.cmd\.(js|ts)$/.test(f.path))
+			.forEach(this.loadCommand);
+
+		dir
+			?.filter(f => f.parent == 'events' || /\.evt\.(js|ts)$/.test(f.path))
+			.forEach(this.loadEvent);
 		
-		switch (basename(path)) {
-			case 'commands':
-				dir?.forEach(this.loadCommand)
-				return;
-				
-			case 'events':
-				dir?.forEach(this.loadEvent)
-				return;
-		}
-
-		if(options.forFile) {
-			dir?.filter(c => /\.evt\.(js|ts)$/.test(c.path)).forEach(this.loadEvent)
-			dir?.filter(c => /\.cmd\.(js|ts)$/.test(c.path)).forEach(this.loadCommand)
-		}
 	}
 	
-	loadCommand(file: File) {
+	private loadCommand = async (file: File) => {
 		try {
-			import(file.path).then(async (f) => {
-				if (!f.default) {
-					throw new Error(`File "${file.path}" hasn't default export`);
+			const f = await import(file.path);
+
+			if (!f.default) {
+				throw new Error(`File "${file.path}" hasn't default export`);
+			}
+
+			const command: Command = f.default;
+			Command.cache.set(command.data.name, command);
+
+			let targetRegister: DJS.GuildApplicationCommandManager | DJS.ApplicationCommandManager<DJS.ApplicationCommand<{ guild: DJS.GuildResolvable; }>, { guild: DJS.GuildResolvable; }, null>;
+			if (process.env.NODE_ENV == 'development') {
+				const guildTestId = process.env.GUILD_TEST;
+
+				if (!guildTestId) {
+					throw new Error('Enviroment variable "GUILD_TEST" not specified');
 				}
-	
-				const command: Command = f.default;
-				Command.cache.set(command.data.name, command);
-	
-				let targetRegister: DJS.GuildApplicationCommandManager | DJS.ApplicationCommandManager<DJS.ApplicationCommand<{ guild: DJS.GuildResolvable; }>, { guild: DJS.GuildResolvable; }, null>;
-				if (process.env.NODE_ENV == 'development') {
-					const guildTestId = process.env.GUILD_TEST;
-	
-					if (!guildTestId) {
-						throw new Error('Enviroment variable "GUILD_TEST" not specified');
-					}
-	
-					targetRegister = (await this.client.guilds.fetch(guildTestId)).commands;
-				} else {
-					targetRegister = this.client.application!.commands;
-				}
-	
-				const fetchedCommand = targetRegister.cache.find(
-					(c) => c.name == command.data.name
-				);
-	
-				if (fetchedCommand) {
-					targetRegister.edit(fetchedCommand.id, command.data);
-				} else {
-					targetRegister.create(command.data);
-				}
-			});
+
+				targetRegister = (await this.client.guilds.fetch(guildTestId)).commands;
+			} else {
+				targetRegister = this.client.application!.commands;
+			}
+
+			const fetchedCommand = targetRegister.cache.find(
+				(c) => c.name == command.data.name
+			);
+
+			if (fetchedCommand) {
+				targetRegister.edit(fetchedCommand.id, command.data);
+			} else {
+				targetRegister.create(command.data);
+			}
 		} catch(e: any) {
-			Logger.error(e);
+			throw e;
 		}
 	}
 
-	loadEvent(file: File) {
+	private loadEvent = async (file: File) => {
 		try {
-			import(file.path).then((f) => {
-				if (!f.default) {
-					throw new Error(`File "${file.path}" hasn't default export`);
-				}
-	
-				const event: Event<any> = f.default;
-				this.client[event.data.once ? "once" : "on"](
-					event.data.type,
-					(...args: any) => event.run(...args)
-				);
-			});
+			const f = await import(file.path)
+
+			if (!f.default) {
+				throw new Error(`File "${file.path}" hasn't default export`);
+			}
+
+			const event: Event<any> = f.default;
+
+			this.client[event.data?.once ? "once" : "on"](
+				event.data.type,
+				(...args: any) => event.run(...args)
+			);
 		} catch(e: any) {
-			Logger.error(e);
+			throw e;
 		}
 	}
 }

@@ -1,7 +1,9 @@
+import loadEnv from './env';
 import DJS from 'discord.js';
 import { Command } from './structures';
-import loadEnv from './env';
 import Config from './config';
+import Loader from './loader';
+import Logger from './logger';
 
 class Client<Ready extends boolean = boolean> extends DJS.Client<Ready> {
 	config: Config;
@@ -21,8 +23,8 @@ class Client<Ready extends boolean = boolean> extends DJS.Client<Ready> {
 
 				try {
 					foundCommand!.run({ interaction });
-				} catch (err) {
-					console.error(`Comando deu errado: ${err}`);
+				} catch (err: any) {
+					Logger.error(`Command Error: ${err.message}`, err.stack);
 				}
 			}
 			else if (interaction.isAutocomplete()) {
@@ -30,11 +32,11 @@ class Client<Ready extends boolean = boolean> extends DJS.Client<Ready> {
 
 				try {
 					foundCommand?.autocomplete?.(interaction);
-				} catch (err) {
-					console.error(`autocomplete erro: ${err}`)
+				} catch (err: any) {
+					Logger.error(`Autocomplete Error: ${err.message}`, err.stack);
 				}
 			}
-		})
+		});
 	}
 
 	public login(): Promise<string> {
@@ -58,5 +60,15 @@ export default Client;
 if(require.main == module) {
 	const config = Config.use();
 
-	new Client(config).login();
+	const client = new Client(config);
+
+	client.waitReady().then(() => Logger.ready(`Logged as ${client.user?.tag}`));
+
+	if(process.env.NODE_ENV == 'development') {
+		const loader = new Loader(client);
+
+		loader.run(config.target);
+	}
+
+	client.login();
 }

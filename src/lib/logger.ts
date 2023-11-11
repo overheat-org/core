@@ -11,8 +11,8 @@ class Logger {
 
 		return true;
 	}
-	static error(error: Error): void
 	static error(message: string, stack?: string): void
+	static error(error: Error): void
 	static error(...args: any) {
 		let log = chalk.black.bgRed(`[ERROR ${getTime()}]`);
 		log += chalk.red(" >> ");
