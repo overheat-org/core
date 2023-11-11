@@ -1,6 +1,6 @@
 {
-  "name": "@overheat-org/core",
-  "description": "A discord core",
+  "name": "@overheat-org/flame.d.js",
+  "description": "A powerfull Discord framework easily to config and performatic to run",
   "version": "1.4.0",
   "main": "index.js",
   "scripts": {
@@ -28,5 +28,8 @@
   },
   "directories": {
     "lib": "lib"
+  },
+  "bin": {
+	"flame": "./lib/cli.js"
   }
 }
